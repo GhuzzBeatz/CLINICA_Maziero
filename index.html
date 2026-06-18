@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>ASO - Maziero Clínica</title>
+    <!-- Content Security Policy para permitir conexões externas -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com https://drive.google.com;">
+    
+    <style>
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; user-select: none; }
+      .container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+      .header { text-align: center; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; margin-bottom: 20px; }
+      .header h2 { margin: 0; color: #2c3e50; text-transform: uppercase; }
+      h3 { color: #2c3e50; border-left: 5px solid #3498db; padding-left: 10px; margin-top: 25px; font-size: 16px;}
+      label { font-weight: bold; display: block; margin-top: 10px; font-size: 13px; color: #333;}
+      input[type="text"], input[type="date"], select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+      .grid-riscos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fafafa; padding: 10px; border: 1px solid #eee; border-radius: 4px; }
+      .titulo-risco { font-weight: bold; color: #e74c3c; font-size: 12px; margin-bottom: 3px; display:block; }
+      .item-check { font-weight: normal; font-size: 13px; display: block; margin-bottom: 2px; cursor: pointer;}
+      .box-exames { height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; background: #fff; margin-top: 5px; }
+      .cat-exame { background-color: #eee; padding: 5px; font-weight: bold; font-size: 12px; color: #333; margin-top: 10px; border-radius: 3px; text-transform: uppercase; }
+      .item-exame { display: flex; align-items: center; margin-bottom: 4px; font-size: 13px; cursor: pointer; }
+      .item-exame input { margin-right: 8px; }
+      
+      /* Botão de Emitir */
+      #btnEmitir { width: 100%; background-color: #27ae60; color: white; padding: 15px; border: none; margin-top: 25px; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s;}
+      #btnEmitir:hover { background-color: #219150; }
+      #btnEmitir:disabled { background-color: #95a5a6; cursor: not-allowed; }
+      
+      /* Botão de Download */
+      #btnDownload { display: none; width: 100%; background-color: #3498db; color: white; padding: 15px; text-align: center; text-decoration: none; margin-top: 10px; border-radius: 5px; font-size: 18px; font-weight: bold; box-sizing: border-box; }
+      #btnDownload:hover { background-color: #2980b9; }
+
+      .row { display: flex; gap: 15px; }
+      .col { flex: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Maziero Clínica</h2>
+        <p>Odontologia e Medicina | CNPJ: 13.227.436/0001-60</p>
+      </div>
+
+      <form id="formASO">
+        <h3>1. Dados da Empresa e Função</h3>
+        <div class="row">
+          <div class="col"><label>Nome da Empresa</label><input type="text" name="empresa"></div>
+          <div class="col"><label>CNPJ</label><input type="text" name="cnpj"></div>
+        </div>
+        <label>Função</label><input type="text" name="funcao">
+        <label>Tipo de Exame</label>
+        <select name="tipo">
+          <option value="Admissional">Admissional</option>
+          <option value="Periódico">Periódico</option>
+          <option value="Demissional">Demissional</option>
+          <option value="Mudança de Função">Mudança de Função</option>
+          <option value="Retorno ao Trabalho">Retorno ao Trabalho</option>
+        </select>
+
+        <h3>2. Dados do Trabalhador</h3>
+        <input type="text" name="nome" placeholder="Nome Completo">
+        <div class="row">
+          <div class="col"><label>Nascimento</label><input type="date" name="nascimento"></div>
+          <div class="col"><label>CPF</label><input type="text" name="cpf"></div>
+          <div class="col"><label>RG</label><input type="text" name="rg"></div>
+        </div>
+
+        <h3>3. Riscos Ocupacionais</h3>
+        <div class="grid-riscos">
+          <div class="grupo-risco">
+            <span class="titulo-risco">FÍSICOS</span>
+            <label class="item-check"><input type="checkbox" value="Calor" class="chk-risco"> Calor</label>
+            <label class="item-check"><input type="checkbox" value="Ruído" class="chk-risco"> Ruído</label>
+          </div>
+          <div class="grupo-risco">
+            <span class="titulo-risco">QUÍMICOS/BIOLÓGICOS</span>
+            <label class="item-check"><input type="checkbox" value="Poeira" class="chk-risco"> Poeira</label>
+            <label class="item-check"><input type="checkbox" value="Fungos/Bactérias" class="chk-risco"> Fungos/Bactérias</label>
+          </div>
+        </div>
+
+        <h3>4. Exames Complementares</h3>
+        <div class="box-exames" id="listaCheckboxes"></div>
+
+        <button type="button" id="btnEmitir" onclick="emitir()">🖨️ GERAR ASO</button>
+        
+        <a id="btnDownload" href="#" target="_blank">⬇️ CLIQUE AQUI PARA BAIXAR</a>
+        
+        <div id="status" style="text-align:center; margin-top:10px; font-weight:bold; color: #555;"></div>
+      </form>
+    </div>
+
+    <script>
+      // ============================================================
+      // ⚠️ COLE AQUI A URL DO SEU GOOGLE APPS SCRIPT (WEB APP) ⚠️
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFJme2pv2JhpGKhNhlGE3TTbA_XdGzv9GOATwP_YO3CyzyLLXug9ieovzpunG-3I0o/exec"; 
+      // Exemplo: https://script.google.com/macros/s/AKfycbx.../exec
+      // ============================================================
+
+      const bancoDeExames = {
+        "1. Clínicos": ["Avaliação Clínica", "Acuidade Visual", "Audiometria", "Espirometria", "ECG", "EEG"],
+        "2. Laboratoriais": ["Hemograma", "Glicemia", "Ureia", "Creatinina", "TGO/TGP", "Colesterol", "Triglicerídeos", "VDRL", "Urina I", "Beta HCG"],
+        "3. Toxicológicos": ["Chumbo", "Mercúrio", "Ácido Hipúrico", "Exame Toxicológico (Cabelo)"],
+        "4. Imagem": ["Raio-X Tórax (OIT)", "Raio-X Coluna", "Ultrassom Abdome"],
+        "5. Outros": ["Teste Ergométrico", "Papanicolau", "PSA", "Odontológico", "Psicossocial"]
+      };
+
+      function carregarExames() {
+        const container = document.getElementById("listaCheckboxes");
+        for (const [cat, lista] of Object.entries(bancoDeExames)) {
+          const div = document.createElement("div"); div.className = "cat-exame"; div.innerText = cat;
+          container.appendChild(div);
+          lista.forEach(ex => {
+            const l = document.createElement("label"); l.className = "item-exame";
+            l.innerHTML = `<input type="checkbox" value="${ex}" class="chk-exame"> ${ex}`;
+            container.appendChild(l);
+          });
+        }
+      }
+      carregarExames();
+
+      async function emitir() {
+        const btn = document.getElementById("btnEmitir");
+        const btnDown = document.getElementById("btnDownload");
+        const status = document.getElementById("status");
+        const form = document.getElementById("formASO");
+
+        // Validação da URL
+        if(!SCRIPT_URL || SCRIPT_URL.includes("COLE_SUA_URL")) {
+          alert("Erro: Configure a URL do Google Script no arquivo HTML.");
+          return;
+        }
+
+        // Coleta os dados
+        const riscos = [];
+        document.querySelectorAll(".chk-risco:checked").forEach(c => riscos.push(c.value));
+        const exames = [];
+        document.querySelectorAll(".chk-exame:checked").forEach(c => exames.push(c.value));
+
+        const dados = {
+          empresa: form.empresa.value, cnpj: form.cnpj.value, nome: form.nome.value,
+          nascimento: form.nascimento.value, cpf: form.cpf.value, rg: form.rg.value,
+          funcao: form.funcao.value, tipo: form.tipo.value,
+          riscos: riscos.join("; "), exames: exames
+        };
+
+        // UI de carregamento
+        btn.disabled = true; btn.innerText = "⏳ PROCESSANDO...";
+        btnDown.style.display = "none";
+        status.innerText = "Enviando dados para o servidor...";
+        status.style.color = "#555";
+
+        try {
+          const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(dados)
+          });
+          
+          const res = await response.json();
+
+          if (res.sucesso) {
+            status.innerHTML = "✅ PDF GERADO COM SUCESSO!";
+            status.style.color = "green";
+            
+            // Abre o download automaticamente no navegador padrão
+            window.open(res.url, '_blank');
+            
+            // Mostra o botão caso o popup falhe
+            btnDown.href = res.url;
+            btnDown.style.display = "block";
+            btnDown.innerText = "⬇️ BAIXAR NOVAMENTE";
+            
+            // --- AQUI ESTÁ A CORREÇÃO PARA LIMPAR TUDO ---
+            form.reset(); 
+            
+            // Volta o botão ao normal
+            btn.innerText = "🖨️ GERAR NOVO ASO";
+            
+          } else {
+            status.innerText = "Erro no servidor.";
+            status.style.color = "red";
+            alert("Erro do Google: " + res.erro);
+          }
+        } catch (err) {
+          console.error(err);
+          status.innerText = "Erro de conexão.";
+          status.style.color = "red";
+          alert("Erro ao conectar: " + err);
+        } finally {
+          btn.disabled = false;
+          if(btn.innerText !== "🖨️ GERAR NOVO ASO") btn.innerText = "🖨️ GERAR ASO";
+        }
+      }
+    </script>
+  </body>
+</html>

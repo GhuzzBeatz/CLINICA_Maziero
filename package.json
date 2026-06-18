@@ -1,0 +1,32 @@
+{
+  "name": "aso-maziero-app",
+  "version": "1.0.0",
+  "description": "Gerador de ASO - Maziero Clínica",
+  "main": "main.js",
+  "author": "Seu Nome ou Empresa",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.maziero.aso",
+    "productName": "ASO Maziero Clínica",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  }
+}
