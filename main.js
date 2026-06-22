@@ -1,13 +1,26 @@
 const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) app.quit();
+
+let win = null;
+
+app.on('second-instance', () => {
+  if (!win) return;
+  if (win.isMinimized()) win.restore();
+  win.show();
+  win.focus();
+});
+
 function createWindow () {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1000,
     height: 800,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false 
+      contextIsolation: false,
+      devTools: !app.isPackaged
     },
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'icon.png') 
@@ -25,6 +38,7 @@ function createWindow () {
 }
 
 app.whenReady().then(() => {
+  if (!gotSingleInstanceLock) return;
   createWindow();
 
   app.on('activate', () => {
